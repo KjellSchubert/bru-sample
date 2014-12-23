@@ -1,0 +1,18 @@
+.c9/
+
+# files created by bru_install
+bru_modules
+bru_common.gypi
+
+# generated make files
+*Makefile
+*.mk
+
+# generated msvc files
+*.sln
+*sdf
+*.suo
+*.vcxproj*
+Default/
+
+*.swp
