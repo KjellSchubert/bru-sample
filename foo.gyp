@@ -6,10 +6,10 @@
             "target_name": "foo",
             "type": "static_library",
             "sources": [
-                "foo/src/foo.cpp"
+                "src/foo.cpp"
             ],
             "include_dirs": [
-                "foo/include"
+                "include"
             ],
             "dependencies": [
                 # to list deps on other external libs you'd write:
@@ -18,7 +18,7 @@
             ],
             "direct_dependent_settings": {
                 "include_dirs": [
-                    "foo/include"
+                    "include"
                 ]
             }
         },
@@ -27,7 +27,7 @@
             "target_name": "foo-test",
             "type": "executable",
             "sources": [
-                "foo/test/test.cpp"
+                "test/test.cpp"
             ],
             "dependencies": [
                 "foo",   # thats the library target above
