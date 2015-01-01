@@ -4,7 +4,8 @@ compiler: clang
 before_install:
     # install gyp
     - sudo apt-get update && sudo apt-get install -y gyp
-    # install bru
+    # install bru (which depends on python3)
+    - sudo apt-get install -y python3
     - git clone https://github.com/KjellSchubert/bru.git
 script:
     # run 'bru install'
