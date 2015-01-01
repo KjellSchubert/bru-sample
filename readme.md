@@ -14,6 +14,7 @@ clang sanitizer options and clang itself):
 
 * apt-cache search clang # => 3.5 available
 * sudo apt-get install clang-3.5 
+* set env vars as listed in bru_overrides.gyp (export CXX=`which clang++` and such)
 
 Install gyp, which bru needs to generate make or vcproj files:
 * sudo apt-get install gyp

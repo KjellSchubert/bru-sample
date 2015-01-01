@@ -5,30 +5,15 @@
     # the command line.
     # Note that this forces clang for all targets: upstream deps and foo.gyp
     # local targets.
-    "make_global_settings": [
-        ["CXX", "/usr/bin/clang++"],
-        ["CC", "/usr/bin/clang++"],
-        ["LINK", "/usr/bin/clang++"]
-    ],
-    
-    "target_defaults": {
-        "cflags": [
-            # this enables C++11 for clang
-            # would it be OK to compile upstream dependencies with C++98,
-            # but downstream ones with C++11? Unsure, I guess not.
-            "-std=c++11",
-            
-            # use clang's address sanitizer across all modules
-            # (note you need the matching ldflags for this cflag)
-            "-fsanitize=address"
-            
-            # this would enable clang's cxxlib, but we can just the default 
-            # gcc stdlib instead
-            #"-stdlib=libc++""
-        ],
-
-        "ldflags": [
-            "-fsanitize=address"
-        ]
-    }
+    # P.S.: this works in c9.io but fails for travis-ci, probably because
+    # travis-ci installs clang elsewhere?
+    #"make_global_settings": [
+    #    ["CXX", "/usr/bin/clang++"],
+    #    ["CC", "/usr/bin/clang"],
+    #    ["LINK", "/usr/bin/clang++"]
+    #],
+    # So set these env vars via command line or ~/.bashrc instead:
+    #   > export CXX=`which clang++`
+    #   > export CC=`which clang`
+    #   > export LINK=`which clang++`
 }

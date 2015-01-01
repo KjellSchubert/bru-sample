@@ -2,15 +2,28 @@
 language: cpp
 compiler: clang
 before_install:
+    
     # install gyp
     - sudo apt-get update && sudo apt-get install -y gyp
-    # install bru (which depends on >= python3.4)
+    
+    # set env vars needed by gyp for explicit compilation with clang
+    # (since gcc will not be able to handle -fsanitize=address)
+    - which clang++
+    - export CXX=`which clang++`
+    - export CC=`which clang`
+    - export LINK=`which clang++`
+    
+    # install bru (which depends on >= python3.2)
     # and ln -s it so it can be invoked conveniently via 'bru ...'
     - sudo apt-get install -y python3
     - git clone https://github.com/KjellSchubert/bru.git
     - sudo ln -s `pwd`/bru/bru.sh /usr/local/bin/bru
+
 script:
     # run 'bru install'
     - bru install
     # run 'bru test'
     - bru test
+    # and run the test in ./src (which wasnt run by 'bru test' which only
+    # ran tests for upstream dependencies)
+    - out/Debug/foo-test

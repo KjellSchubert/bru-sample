@@ -3,6 +3,30 @@
         "bru_common.gypi",
         "bru_overrides.gypi"
     ],
+
+    # initially I had these settings in bru_overrides.gyp, but one of the zeromq
+    # tests fails with -fsanitize=address enabled (bug or false alarm?)
+    "target_defaults": {
+        "cflags": [
+            # this enables C++11 for clang
+            # would it be OK to compile upstream dependencies with C++98,
+            # but downstream ones with C++11? Unsure, I guess not.
+            "-std=c++11",
+            
+            # use clang's address sanitizer across all modules
+            # (note you need the matching ldflags for this cflag)
+            "-fsanitize=address"
+            
+            # this would enable clang's cxxlib, but we can just the default 
+            # gcc stdlib instead
+            #"-stdlib=libc++""
+        ],
+
+        "ldflags": [
+            "-fsanitize=address"
+        ]
+    },
+
     "targets": [
         {
             "target_name": "foo",
