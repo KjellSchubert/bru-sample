@@ -1,0 +1,13 @@
+# from http://docs.travis-ci.com/user/languages/cpp/
+language: cpp
+compiler: clang
+before_install:
+    # install gyp
+    - sudo apt-get update && sudo apt-get install -y gyp
+    # install bru
+    - git clone https://github.com/KjellSchubert/bru.git
+script:
+    # run 'bru install'
+    - bru/bru.sh install
+    # run 'bru test'
+    - bru/bru.sh test

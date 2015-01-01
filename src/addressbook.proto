@@ -1,0 +1,38 @@
+// This specifies the messages passed between zeromq client & server. 
+// I copied this file from one of the protobuf samples since I'm a lazy 
+// bastard :) To (re)generate the ./*.pb.* on c9.io files run:
+//   > cd src/..
+//   > ~/workspace/out/Debug/protoc src/addressbook.proto --cpp_out=.
+// Note that cwd is important for protoc since it determines the relative
+// include path that will end up in addressbook.proto.cc.
+// Also note the protoc action in ../foo.gyp which runs protoc automatically
+// during the build.
+
+package tutorial;
+
+option java_package = "com.example.tutorial";
+option java_outer_classname = "AddressBookProtos";
+
+message Person {
+  required string name = 1;
+  required int32 id = 2;        // Unique ID number for this person.
+  optional string email = 3;
+
+  enum PhoneType {
+    MOBILE = 0;
+    HOME = 1;
+    WORK = 2;
+  }
+
+  message PhoneNumber {
+    required string number = 1;
+    optional PhoneType type = 2 [default = HOME];
+  }
+
+  repeated PhoneNumber phone = 4;
+}
+
+// Our address book file is just one of these.
+message AddressBook {
+  repeated Person person = 1;
+}
