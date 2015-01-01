@@ -1,12 +1,13 @@
 # from http://docs.travis-ci.com/user/languages/cpp/
 language: cpp
 compiler: clang
+python:
+    - 3.4
 before_install:
     # install gyp
     - sudo apt-get update && sudo apt-get install -y gyp
-    # install bru (which depends on python3)
+    # install bru (which depends on >= python3.4)
     # and ln -s it so it can be invoked conveniently via 'bru ...'
-    - sudo apt-get install -y python3
     - git clone https://github.com/KjellSchubert/bru.git
     - sudo ln -s `pwd`/bru/bru.sh /usr/local/bin/bru
 script:
