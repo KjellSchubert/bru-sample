@@ -7,8 +7,9 @@ before_install:
     # install bru (which depends on python3)
     - sudo apt-get install -y python3
     - git clone https://github.com/KjellSchubert/bru.git
+    - sudo ln /home/ubuntu/bru/bru.sh /usr/bin/bru
 script:
     # run 'bru install'
-    - bru/bru.sh install
+    - bru install
     # run 'bru test'
-    - bru/bru.sh test
+    - bru test
