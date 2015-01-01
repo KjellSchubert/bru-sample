@@ -2,6 +2,9 @@ This here is a small sample application that uses bru to pull its external
 module dependencies, which in this case are google protocol buffers 
 (bru:protobuf), 0mq (bru:zeromq) and googletest.
 
+[![Build Status](https://travis-ci.org/KjellSchubert/bru-sample.svg?branch=master)](https://travis-ci.org/KjellSchubert/bru-sample)
+
+
 For instructions on how to install bru itself see 
 [here](https://github.com/KjellSchubert/bru). Here the instructions for how
 to set up bru in a c9.io custom workspace created from this git repo here: so
