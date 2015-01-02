@@ -14,8 +14,14 @@ int main (int argc, char *argv[])
 
     for( int request = 0 ; request < 10 ; request++) {
         
-        using namespace std::chrono; 
-        auto t0 = steady_clock::now();
+        using namespace std::chrono;
+        // here I wanted to use steady_clock initially, but on travis-ci's
+        // current stdlib version this is not supported, see 
+        //   http://stackoverflow.com/questions/16518705/probleme-with-stdchrono
+        // So using non-monotonic system_clock for now.
+        using std::chrono::system_clock;
+        
+        auto t0 = system_clock::now();
         std::cout << "sending request (start the server if it's not running yet)...\n";
         s_send (requester, "Hello");
         std::cout << "sent request, waiting for reply...\n";
@@ -23,7 +29,7 @@ int main (int argc, char *argv[])
         
         std::cout << "Received reply " << request
             << " [" << string << "] after " 
-            << duration_cast<milliseconds>(steady_clock::now() - t0).count()
+            << duration_cast<milliseconds>(system_clock::now() - t0).count()
             << " ms" << std::endl;
     }
     
