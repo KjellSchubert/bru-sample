@@ -5,5 +5,6 @@
 zmq::message_t string2msg(const std::string& str);
 std::string msg2string(const zmq::message_t& msg);
 
-std::string s_recv(zmq::socket_t& socket);
-void s_send(zmq::socket_t& socket, const std::string& str);
+// methods for sending a text message over a zmq socket
+std::string recv_text_msg(zmq::socket_t& socket);
+void send_text_msg(zmq::socket_t& socket, const std::string& str);

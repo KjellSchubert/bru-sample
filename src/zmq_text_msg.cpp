@@ -1,6 +1,6 @@
 // some helpers for sending strings as zmq messages
 
-#include "foo/zmq_string.h"
+#include "foo/zmq_text_msg.h"
 #include <string>
 
 std::string msg2string(const zmq::message_t& msg) {
@@ -17,13 +17,13 @@ zmq::message_t string2msg(const std::string& str) {
     return msg;
 }
 
-std::string s_recv(zmq::socket_t& socket) {
+std::string recv_text_msg(zmq::socket_t& socket) {
     zmq::message_t msg;
     socket.recv(&msg);
-    return msg2string(msg);
+    return msg2string(msg); // is this efficient? rvo? has move ctor?
 }
 
-void s_send(zmq::socket_t& socket, const std::string& str ) {
+void send_text_msg(zmq::socket_t& socket, const std::string& str ) {
     auto msg = string2msg(str);
     socket.send(msg);
 }

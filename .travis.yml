@@ -57,3 +57,9 @@ script:
     # and run the test in ./src (which wasnt run by 'bru test' which only
     # ran tests for upstream dependencies)
     - out/Debug/addressbook-test
+    
+    # and test client-server app:
+    # TODO: suppy a shorter timeout than travis-ci's default of 10mins without
+    # log output.
+    - out/Debug/server &
+    - out/Debug/client
