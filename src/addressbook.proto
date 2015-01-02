@@ -7,6 +7,7 @@
 // include path that will end up in addressbook.proto.cc.
 // Also note the protoc action in ../foo.gyp which runs protoc automatically
 // during the build.
+// P.S.: I added a quit message to the sample.
 
 package tutorial;
 
@@ -35,4 +36,20 @@ message Person {
 // Our address book file is just one of these.
 message AddressBook {
   repeated Person person = 1;
+}
+
+message Quit {
+  // empty
+}
+
+// Create a single message as the union of all messages, see
+// http://www.dotkam.com/2011/09/09/zeromq-and-google-protocol-buffers/ and
+// https://developers.google.com/protocol-buffers/docs/techniques?csw=1#union
+// P.S.: oneof might be a better choice for this use case.
+message MessageUnion {
+  oneof msg {
+    Person person = 1;
+    AddressBook addressbook = 2;
+    Quit quit = 3;
+  }
 }
