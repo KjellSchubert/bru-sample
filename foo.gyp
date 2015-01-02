@@ -16,10 +16,6 @@
             # use clang's address sanitizer across all modules
             # (note you need the matching ldflags for this cflag)
             "-fsanitize=address"
-            
-            # this would enable clang's cxxlib, but we can just the default 
-            # gcc stdlib instead
-            #"-stdlib=libc++""
         ],
 
         "ldflags": [

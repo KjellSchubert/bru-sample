@@ -1,6 +1,8 @@
 # from http://docs.travis-ci.com/user/languages/cpp/
 language: cpp
-compiler: clang
+compiler: 
+    - clang 3.5
+
 before_install:
     
     # install gyp
@@ -9,6 +11,9 @@ before_install:
     # set env vars needed by gyp for explicit compilation with clang
     # (since gcc will not be able to handle -fsanitize=address)
     - which clang++
+    - clang++ --version
+    #- which g++
+    #- g++ --version
     - export CXX=`which clang++`
     - export CC=`which clang`
     - export LINK=`which clang++`
@@ -19,11 +24,24 @@ before_install:
     - git clone https://github.com/KjellSchubert/bru.git
     - sudo ln -s `pwd`/bru/bru.sh /usr/local/bin/bru
 
-script:
-    # run 'bru install'
+install:
+    # it doesnt really matter if you pull deps via 'bru install' during the
+    # travis-ci install or script stage, but
+    #   http://docs.travis-ci.com/user/build-configuration/
+    # suggests the install stage for convention's sake. So let's install
+    # upstream dependencies needed during C++ compilation now, e.g.
+    # googletest, protobuf, ... Not that pulling deps here implies getting
+    # the tar.gz for these modules unpacked, running ./configure for some of 
+    # them, but not building them yet. Not that this matters a lot.
     - bru install
-    # run 'bru test'
+
+script:
+    # build & run quick tests for upstream dependencies. These are the tests
+    # as specified in bru:library/protobuf_and_such/*.gyp.
+    # Since this steps builds all targets in ./*gyp it will also build the test
+    # app's own cpp files in ./src
     - bru test
+    
     # and run the test in ./src (which wasnt run by 'bru test' which only
     # ran tests for upstream dependencies)
     - out/Debug/foo-test
