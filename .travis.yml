@@ -13,7 +13,7 @@ before_install:
     # with that old stdlib. Let's pull g++ >= 4.8's stdlib instead:
     - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
     - sudo apt-get update -qq
-    - sudo apt-get install -qq g++-4.8; fi
+    - sudo apt-get install -qq g++-4.8
     - which g++
     - g++ --version
 
