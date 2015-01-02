@@ -18,10 +18,10 @@ int main (int argc, char *argv[])
         // here I wanted to use steady_clock initially, but on travis-ci's
         // current stdlib version this is not supported, see 
         //   http://stackoverflow.com/questions/16518705/probleme-with-stdchrono
-        // So using non-monotonic system_clock for now.
-        using std::chrono::system_clock;
+        // P.S.: let's ensure travis-ci installs stdlib >= 4.8 instead.
+        using std::chrono::steady_clock;
         
-        auto t0 = system_clock::now();
+        auto t0 = steady_clock::now();
         std::cout << "sending request (start the server if it's not running yet)...\n";
         s_send (requester, "Hello");
         std::cout << "sent request, waiting for reply...\n";
@@ -29,7 +29,7 @@ int main (int argc, char *argv[])
         
         std::cout << "Received reply " << request
             << " [" << string << "] after " 
-            << duration_cast<milliseconds>(system_clock::now() - t0).count()
+            << duration_cast<milliseconds>(steady_clock::now() - t0).count()
             << " ms" << std::endl;
     }
     

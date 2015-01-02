@@ -7,7 +7,16 @@ before_install:
     
     # install gyp
     - sudo apt-get update && sudo apt-get install -y gyp
-    
+
+    # From https://github.com/travis-ci/travis-ci/issues/1379 :
+    # The default gcc & stdlib 4.6 as of January 2015, and C++11 sucks
+    # with that old stdlib. Let's pull g++ >= 4.8's stdlib instead:
+    - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    - sudo apt-get update -qq
+    - sudo apt-get install -qq g++-4.8; fi
+    - which g++
+    - g++ --version
+
     # set env vars needed by gyp for explicit compilation with clang
     # (since gcc will not be able to handle -fsanitize=address)
     - which clang++
