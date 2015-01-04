@@ -23,7 +23,7 @@ void ZmqReactorRequest::sendResponse(const zmq::message_t& response) const {
     }
     else {
         std::cout << "reactor worker thread sending message to inprocSocket\n";
-        zmq::socket_t inprocSocket (context, ZMQ_PAIR); //xxx not PAIR!
+        zmq::socket_t inprocSocket (context, ZMQ_PUSH);
         inprocSocket.connect(inprocSocketAddr.c_str());
         request.sendResponse(response, inprocSocket);
     }
@@ -44,9 +44,11 @@ void ZmqReactor::run() {
 
     // see section 'Multithreading with ZeroMQ' in the guide: use ZMQ_PAIR
     // for inter-thread communication, don't have shared state.
+    // P.S.: it's not a 1:1 connection, rather use PUSH/PULL, as in
+    // http://learning-0mq-with-pyzmq.readthedocs.org/en/latest/pyzmq/patterns/pushpull.html
     // Worker threads will post their results to the inprocSocket, from which
     // the result will get forwarded back to the tcpSocket.
-    zmq::socket_t inprocSocket (context, ZMQ_PAIR); //xxx tru sub/pub instead! pair can fail with multiple worker threads
+    zmq::socket_t inprocSocket (context, ZMQ_PULL);
     auto inprocSocketAddr = "inproc://reactor1"; // fixed name makes it effectively a singleton
     inprocSocket.bind(inprocSocketAddr);
 
