@@ -1,70 +1,91 @@
 // copied partially from http://zguide.zeromq.org/cpp:rrserver
 
 #include "zmq.hpp" // from module cppzmq
+#include "foo/zmq_util.h"
 #include "foo/zmq_text_msg.h"
 #include "foo/zmq_protobuf_msg.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <stdexcept>
+#include <vector>
+#include <array>
+#include <thread>
+
+// TODO
+class ZmqReactor {
+    public:
+        void setMessageHandler(const std::function<void(const ZmqRouterMsg& msg)>& handler);
+        void start();
+        void stop();
+};
 
 int main () {
     //  Prepare our context and socket
     zmq::context_t context (1);
-    zmq::socket_t socket (context, ZMQ_REP);
-    socket.bind ("tcp://*:5555");
+    zmq::socket_t tcpSocket (context, ZMQ_ROUTER);
+    tcpSocket.bind ("tcp://*:5555");
     std::cout << "listening...\n";
 
-    #if 0
+    // see section 'Multithreading with ZeroMQ' in the guide: use ZMQ_PAIR
+    // for inter-thread communication, don't have shared state.
+    // Worker threads will post their results to the inprocSocket, from which
+    // the result will get forwarded back to the tcpSocket.
+    zmq::socket_t inprocSocket (context, ZMQ_PAIR);
+    auto inprocSocketAddr = "inproc://pair1";
+    inprocSocket.bind(inprocSocketAddr);
+
+    std::vector<zmq::pollitem_t> pollItems { // why cant I use std::array here?
+        { tcpSocket, 0, ZMQ_POLLIN, 0 },
+        { inprocSocket, 0, ZMQ_POLLIN, 0 }
+    };
     
-    // here's the original string-based protocol (which could easily send json):
     while (true) {
-        zmq::message_t request;
+        //  Wait for next request from client, or a response from a worker:
+        zmq::poll (&pollItems[0], pollItems.size(), -1);
+        if (pollItems[0].revents & ZMQ_POLLIN) {
+            ZmqRouterMsg msg { readMultiFrameMessage(tcpSocket) };
 
-        //  Wait for next request from client
-        std::string msgText = recv_text_msg(socket);
-        std::cout << "Received message [" << msgText << ']' << std::endl;
-
-        //  Do some 'work'
-        if (msgText == "quit") {
-            std::cout << "quitting server\n";
-            send_text_msg(socket, "ack");
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            const auto& payload = msg2protobuf(*msg.getPayload());
+            std::cout << "received message from tcpSocket: " 
+                << Message2HumanReadableString(payload) << '\n';
+            if (payload.msg_case() == tutorial::MessageUnion::kQuit) {
+                std::cout << "quitting server\n";
+                msg.sendResponse(tcpSocket, string2msg("ack"));
+                break;
+            }
+            
+            // creating one thread per request won't scale well, but this
+            // is just an example. TODO: simulate asyncio with an external
+            // REST API server here.
+            auto worker = std::thread([&context, msg, inprocSocketAddr]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         
-        //  Send reply back to client
-        send_text_msg(socket, "World");
-    }
-    #else
-    
-    // here's the protobuf-based protocol for comparison:
-    // (see also http://www.dotkam.com/2011/09/09/zeromq-and-google-protocol-buffers/)
-    while (true) {
-        zmq::message_t request;
-
-        //  Wait for next request from client
-        tutorial::MessageUnion readMsg = recv_protobuf_msg(socket);
-        std::cout << "Received message [" << Message2HumanReadableString(readMsg) 
-            << ']' << std::endl;
-
-        //  Do some 'work'
-        if (readMsg.msg_case() == tutorial::MessageUnion::kQuit) {
-            std::cout << "quitting server\n";
-            send_text_msg(socket, "ack");
-            break;
+                tutorial::MessageUnion response;
+                auto addressBook = response.mutable_addressbook();
+                auto somePerson = addressBook->add_person();
+                somePerson->set_name("santa");
+                somePerson->set_id(2);
+                
+                // Send reply back to client
+                // Which for ZMQ_ROUTER again requires 3 frames/parts.
+                // Note that sockets must not be shared between threads, so
+                // here we connect to an inproc socket and send the result to
+                // that.
+                std::cout << "worker sending message to inprocSocket\n";
+                zmq::socket_t inprocSocket (context, ZMQ_PAIR);
+                inprocSocket.connect(inprocSocketAddr);
+                msg.sendResponse(inprocSocket, protobuf2msg(response));
+            });
+            worker.detach();
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        
-        //  Send reply back to client
-        tutorial::MessageUnion sentMsg;
-        auto addressBook = sentMsg.mutable_addressbook();
-        auto somePerson = addressBook->add_person();
-        somePerson->set_name("santa");
-        somePerson->set_id(2);
-        send_protobuf_msg(socket, sentMsg); // send pointless empty address book
+        if (pollItems[1].revents & ZMQ_POLLIN) {
+            // forward a response to from inprocSocket to tcpSocket
+            std::cout << "forwarding msg from inprocSocket to tcpSocket\n";
+            auto msg = readMultiFrameMessage(inprocSocket);
+            writeMultiFrameMessage(tcpSocket, msg);
+        }
     }
-    
-    #endif
-    
+
     return 0;
 }

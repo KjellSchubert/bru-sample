@@ -34,14 +34,3 @@ zmq::message_t protobuf2msg(const tutorial::MessageUnion& msg) {
         
     return string2msg(encoded);
 }
-
-tutorial::MessageUnion recv_protobuf_msg(zmq::socket_t& socket) {
-    zmq::message_t msg;
-    socket.recv(&msg);
-    return msg2protobuf(msg); // is this efficient? rvo? has move ctor?
-}
-
-void send_protobuf_msg(zmq::socket_t& socket, const tutorial::MessageUnion& str ) {
-    auto msg = protobuf2msg(str);
-    socket.send(msg);
-}

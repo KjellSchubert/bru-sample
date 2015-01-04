@@ -16,14 +16,3 @@ zmq::message_t string2msg(const std::string& str) {
     std::memcpy(msg.data(), &str[0], msgLen);
     return msg;
 }
-
-std::string recv_text_msg(zmq::socket_t& socket) {
-    zmq::message_t msg;
-    socket.recv(&msg);
-    return msg2string(msg); // is this efficient? rvo? has move ctor?
-}
-
-void send_text_msg(zmq::socket_t& socket, const std::string& str ) {
-    auto msg = string2msg(str);
-    socket.send(msg);
-}
