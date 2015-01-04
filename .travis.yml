@@ -77,3 +77,9 @@ script:
     # log output.
     - out/Debug/server &
     - out/Debug/client_req
+
+after_success:
+    # optional: run https://github.com/okkez/coveralls-lcov to upload coverage
+    # to coveralls.io
+    - gem install coveralls-lcov
+    - coveralls-lcov coverals/coverage.info
