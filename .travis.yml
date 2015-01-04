@@ -89,4 +89,4 @@ after_success:
     # optional: run https://github.com/okkez/coveralls-lcov to upload coverage
     # to coveralls.io
     - gem install coveralls-lcov
-    - coveralls-lcov coverals/coverage_total.info
+    - coveralls-lcov coverage_total.info
