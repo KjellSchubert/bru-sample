@@ -28,9 +28,9 @@ void writeMultiFrameMessage(zmq::socket_t& socket, const ZmqMultiFrameMsg& msg);
 // To have the router send a message back to this particular client just prefix
 // your response by copies of msg parts 1+2. This means the router may respond
 // to clients in any order it wants (or not at all).
-class ZmqRouterMsg {
+class ZmqRouterRequest {
     public:
-        ZmqRouterMsg(const ZmqMultiFrameMsg& msg);
+        ZmqRouterRequest(const ZmqMultiFrameMsg& msg);
         
         // get the 3rd part of the message, containing the frame sent by
         // the ZMQ_REQ client.
@@ -39,7 +39,9 @@ class ZmqRouterMsg {
         }
         
         // sends a response to the original sender of the message
-        void sendResponse(zmq::socket_t& socket, const zmq::message_t& response) const;
+        // WARNING: you must not pass zmq socket refs across thread boundaries,
+        // instead pass inproc socket address/names (see ZmqReactor)
+        void sendResponse(const zmq::message_t& response, zmq::socket_t& socket) const;
         
     private:
         std::shared_ptr<zmq::message_t> sender;

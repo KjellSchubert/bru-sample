@@ -26,7 +26,7 @@ void writeMultiFrameMessage(zmq::socket_t& socket, const ZmqMultiFrameMsg& msg) 
     socket.send(*frames.back());
 }
 
-ZmqRouterMsg::ZmqRouterMsg(const ZmqMultiFrameMsg& msg) {
+ZmqRouterRequest::ZmqRouterRequest(const ZmqMultiFrameMsg& msg) {
     if (msg.frames.size() < 3)
         throw std::runtime_error("ZMQ_ROUTER unexpected multipart msg length: " 
             + std::to_string(msg.frames.size()));
@@ -37,7 +37,10 @@ ZmqRouterMsg::ZmqRouterMsg(const ZmqMultiFrameMsg& msg) {
     payload = msg.frames[2];
 }
 
-void ZmqRouterMsg::sendResponse(zmq::socket_t& socket, const zmq::message_t& response) const {
+void ZmqRouterRequest::sendResponse(
+    const zmq::message_t& response, 
+    zmq::socket_t& socket) const 
+{
     socket.send(*sender.get(), ZMQ_SNDMORE);
     socket.send(*empty.get(), ZMQ_SNDMORE);
     socket.send(const_cast<zmq::message_t&>(response));
