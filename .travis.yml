@@ -62,4 +62,4 @@ script:
     # TODO: suppy a shorter timeout than travis-ci's default of 10mins without
     # log output.
     - out/Debug/server &
-    - out/Debug/client
+    - out/Debug/client_req
