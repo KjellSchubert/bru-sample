@@ -38,6 +38,7 @@ before_install:
     
     # optional: install https://github.com/okkez/coveralls-lcov
     - sudo apt-get install -y lcov
+    - lcov --version
 
 install:
     # it doesnt really matter if you pull deps via 'bru install' during the
@@ -61,13 +62,13 @@ script:
     # ran tests for upstream dependencies)
     # All the lcov (and genhtml) lines are for computing unit test code coverage
     # (exactly the same lines can compute test cov for any *.gyp project).
-    - lcov --no-external --zerocounters --directory out/
-    - lcov --no-external --capture --initial --base-directory . --directory out \
+    - lcov --zerocounters --directory out/
+    - lcov --capture --initial --base-directory . --directory out
            --output-file coverage_base.info
     - out/Debug/addressbook-test
-    - lcov --no-external --capture --base-directory . --directory out \
+    - lcov --capture --base-directory . --directory out
            --output-file coverage_test.info
-    - lcov --add-tracefile coverage_base.info --add-tracefile coverage_test.info \
+    - lcov --add-tracefile coverage_base.info --add-tracefile coverage_test.info
            --output-file coverage_total.info
     - genhtml --output-directory coverage coverage_total.info
     
