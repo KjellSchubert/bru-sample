@@ -49,7 +49,7 @@ int main () {
         auto worker = std::thread([req]() {
             // do some 'work', pretend this is a REST API call to some 
             // HTTP server here.
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
             tutorial::MessageUnion response;
             auto addressBook = response.mutable_addressbook();

@@ -57,29 +57,36 @@ script:
     # Since this steps builds all targets in ./*gyp it will also build the test
     # app's own cpp files in ./src
     - bru test
-    
-    # and run the test in ./src (which wasnt run by 'bru test' which only
-    # ran tests for upstream dependencies)
+
     # All the lcov (and genhtml) lines are for computing unit test code coverage
     # (exactly the same lines can compute test cov for any *.gyp project).
     - lcov --zerocounters --directory out/
     - lcov --capture --initial --base-directory . --directory out
            --output-file coverage_base.info
+    
+    # and run the test in ./src (which wasnt run by 'bru test' which only
+    # ran tests for upstream dependencies)
     - out/Debug/addressbook-test
+    
+    # and test client-server app:
+    - out/Debug/server &
+    - out/Debug/client_req
+
+    # warning: there's a race condition here: the previous server process 
+    # may not have stopped listening to the TCP port yet. TODO: fix race.
+    - out/Debug/server &
+    - out/Debug/client_dealer
+
+    # running lcov here ensures that both addressbook-test and server/client
+    # executables will count towards test cov
     - lcov --capture --base-directory . --directory out
            --output-file coverage_test.info
     - lcov --add-tracefile coverage_base.info --add-tracefile coverage_test.info
            --output-file coverage_total.info
     - genhtml --output-directory coverage coverage_total.info
-    
-    # and test client-server app:
-    # TODO: suppy a shorter timeout than travis-ci's default of 10mins without
-    # log output.
-    - out/Debug/server &
-    - out/Debug/client_req
 
 after_success:
     # optional: run https://github.com/okkez/coveralls-lcov to upload coverage
     # to coveralls.io
     - gem install coveralls-lcov
-    - coveralls-lcov coverals/coverage.info
+    - coveralls-lcov coverals/coverage_total.info
